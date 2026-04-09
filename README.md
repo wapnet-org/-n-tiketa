@@ -46,14 +46,14 @@ Visit [tiketa.app](https://www.tiketa.app) to get started.
 | | |
 |---|---|
 | Website | [tiketa.app](https://www.tiketa.app) |
-| Email | [info@tiketa.eu](mailto:info@tiketa.eu) |
+| Email | [arrowvyaleveka@gmail.com](mailto:arrowvyaleveka@gmail.com) |
 | Phone | +370 618 07405 |
-| Facebook | [facebook.com/Tiketa](https://www.facebook.com/Tiketa) |
+| Facebook | [instagram.com/aaron_vyal](https://www.instagram.com/aaron_vyal) |
 
 ---
 
 <div align="center">
 
-© 2004–2026 Tiketa. All rights reserved.
+© 2026 Tiketa. All rights reserved.
 
 </div>
