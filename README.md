@@ -1,17 +1,16 @@
 <div align="center">
 
-# 🎟️ Tiketa — Univent Platform
+# 🎟️ Tiketa — Event Platform
 
 **Full-stack event ticketing platform — microservices architecture**
 
-[![Website](https://img.shields.io/badge/tiketa.lt-Visit%20Website-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.tiketa.lt)
+[![Website](https://img.shields.io/badge/tiketa.lt-Visit%20Website-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.tiketa.app)
 [![Facebook](https://img.shields.io/badge/Facebook-Follow%20Us-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/Tiketa)
 [![Email](https://img.shields.io/badge/Contact-info@tiketa.eu-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:info@tiketa.eu)
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat-square)
 ![Architecture](https://img.shields.io/badge/architecture-microservices-blueviolet?style=flat-square)
 ![Region](https://img.shields.io/badge/region-Baltics-orange?style=flat-square)
-![Since](https://img.shields.io/badge/since-2004-lightgrey?style=flat-square)
 
 </div>
 
@@ -100,7 +99,7 @@ The platform is built as a **microservices monorepo**, with each service owning 
 
 | Channel | Info |
 |---|---|
-| 🌐 Website | [tiketa.lt](https://www.tiketa.lt) |
+| 🌐 Website | [tiketa.lt](https://www.tiketa.app) |
 | 📧 Email | [info@tiketa.eu](mailto:info@tiketa.eu) |
 | 📞 Phone | +370 618 07405 |
 | 📘 Facebook | [facebook.com/Tiketa](https://www.facebook.com/Tiketa) |
