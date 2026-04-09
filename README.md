@@ -4,7 +4,7 @@
 
 **Full-stack event ticketing platform — microservices architecture**
 
-[![Website](https://img.shields.io/badge/tiketa.lt-Visit%20Website-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.tiketa.app)
+[![Website](https://img.shields.io/badge/tiketa.app-Visit%20Website-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.tiketa.app)
 [![Facebook](https://img.shields.io/badge/Facebook-Follow%20Us-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/Tiketa)
 [![Email](https://img.shields.io/badge/Contact-info@tiketa.eu-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:info@tiketa.eu)
 
