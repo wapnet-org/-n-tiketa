@@ -99,7 +99,7 @@ The platform is built as a **microservices monorepo**, with each service owning 
 
 | Channel | Info |
 |---|---|
-| 🌐 Website | [tiketa.lt](https://www.tiketa.app) |
+| 🌐 Website | [tiketa.app](https://www.tiketa.app) |
 | 📧 Email | [info@tiketa.eu](mailto:info@tiketa.eu) |
 | 📞 Phone | +370 618 07405 |
 | 📘 Facebook | [facebook.com/Tiketa](https://www.facebook.com/Tiketa) |
