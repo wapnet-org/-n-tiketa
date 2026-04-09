@@ -20,26 +20,77 @@
 
 Tiketa is an open public event ticketing platform — anyone can create an event (free, paid, or private) and sell tickets. Participants can discover events, purchase tickets, vote, and leave reviews.
 
-The platform is built as a **microservices monorepo** where each service owns its own database, business logic, and API. Services communicate synchronously via the BFF (Backend-for-Frontend) and asynchronously via RabbitMQ.
+The platform is organized as a **multi-repo** project: each service lives in its own GitHub repository and is referenced here as a Git submodule. The main repo (`-n`) acts as the umbrella — it holds the root configuration files (`docker-compose.yml`, `.env.example`, `docs/`) and references all service repos.
+
+---
+
+## Repositories
+
+| Service | Repository | Description |
+|---|---|---|
+| **auth-service** | [wapnet-org/-n-auth-service](https://github.com/wapnet-org/-n-auth-service) | Authentication, sessions, user accounts, KYC |
+| **bff-service** | [wapnet-org/-n-bff](https://github.com/wapnet-org/-n-bff) | API gateway — session management, request routing |
+| **booking-service** | [wapnet-org/-n-booking](https://github.com/wapnet-org/-n-booking) | Ticket reservations, QR codes, order management |
+| **engagement-service** | [wapnet-org/-n-engagement](https://github.com/wapnet-org/-n-engagement) | Likes, comments, saves, follows, votes, reviews, ads |
+| **event-service** | [wapnet-org/-n-event-service](https://github.com/wapnet-org/-n-event-service) | Events, tickets, promo codes, affiliate links |
+| **frontend** | [wapnet-org/-n-frontend](https://github.com/wapnet-org/-n-frontend) | React PWA (Vite + TanStack Query + Lucide React) |
+| **notification-service** | [wapnet-org/-n-notification-service](https://github.com/wapnet-org/-n-notification-service) | Push & email notifications (RabbitMQ consumer) |
+| **payment-service** | [wapnet-org/-n-payment](https://github.com/wapnet-org/-n-payment) | Stripe + Mobile Money, commissions, refunds |
+| **reel-service** | [wapnet-org/-n-reels](https://github.com/wapnet-org/-n-reels) | Short video content (reels & stories) |
+| **transcode-service** | [wapnet-org/-n-transcode](https://github.com/wapnet-org/-n-transcode) | Video transcoding pipeline |
+| **main repo** | [wapnet-org/-n](https://github.com/wapnet-org/-n) | Root config, docker-compose, docs, submodules |
+
+---
+
+## Getting Started
+
+### Clone everything
+
+```bash
+git clone --recurse-submodules https://github.com/wapnet-org/-n.git
+```
+
+### Update all submodules to latest
+
+```bash
+git submodule update --remote --merge
+```
+
+### Start all services
+
+```bash
+cp .env.example .env
+# Fill in the required values in .env
+docker-compose up -d
+```
+
+### Seed the databases
+
+Run seeds in order — auth-service must run first since other services depend on its user IDs:
+
+```bash
+npm run prisma:seed --prefix auth-service
+npm run prisma:seed --prefix event-service
+npm run prisma:seed --prefix booking-service
+npm run prisma:seed --prefix engagement-service
+npm run prisma:seed --prefix payment-service
+npm run prisma:seed --prefix notification-service
+```
+
+### Test accounts (password: `Password123!`)
+
+| Email | Role | University |
+|---|---|---|
+| admin@buyin.cc | ADMIN | Buyin |
+| alice@buyin.cc | STUDENT | Buyin |
+| clara@buyin.cc | ORGANIZER | Buyin |
+| hugo@buyin.cc | ORGANIZER | Buyin |
+| david@wappnet.cc | STUDENT | Wappnet |
+| emma@wappnet.cc | ORGANIZER | Wappnet |
 
 ---
 
 ## Architecture
-
-```
-tiketa/
-├── auth-service          # Authentication, sessions, user accounts, KYC
-├── bff-service           # API gateway — session management, request routing
-├── booking-service       # Ticket reservations, QR codes, order management
-├── engagement-service    # Likes, comments, saves, follows, votes, reviews, ads
-├── event-service         # Events, tickets, promo codes, affiliate links
-├── frontend              # React PWA (Vite + TanStack Query + Lucide React)
-├── notification-service  # Push & email notifications (RabbitMQ consumer)
-├── payment-service       # Stripe + Mobile Money, commissions, refunds
-├── reel-service          # Short video content (reels & stories)
-├── transcode-service     # Video transcoding pipeline
-└── docs/                 # Architecture docs, Postman collections, changelogs
-```
 
 ### Communication flow
 
@@ -64,6 +115,8 @@ Services → RabbitMQ (exchange: univent.notifications)
   ├── payment.refunded      → booking-service updates status
   └── xp.updated            → auth-service updates user XP/badge
 ```
+
+The frontend communicates **only** with the BFF via `session-id` cookie — no JWT is exposed to the browser.
 
 ---
 
@@ -144,217 +197,6 @@ Role switching is supported — an `ORGANIZER` can switch to `STANDARD` view wit
 | KYC verification | auth-service | ID document + bank info for organizer accounts |
 | i18n | frontend | French and English, persisted in localStorage |
 | PWA | frontend | Installable, offline fallback, service worker caching |
-
----
-
-## Services — Quick Reference
-
-### auth-service (port 3000)
-
-Handles user accounts, authentication, KYC, and groups.
-
-```
-POST /api/auth/register           — create account
-POST /api/auth/verify-email       — OTP verification
-POST /api/auth/login              — login (returns JWT + sets refresh cookie)
-POST /api/auth/logout             — invalidate session
-POST /api/auth/refresh            — refresh access token
-POST /api/auth/forgot-password    — send reset link
-POST /api/auth/reset-password     — set new password
-POST /api/auth/verify-student-id  — student ID verification (onboarding)
-POST /api/auth/upload-card        — student card upload (onboarding)
-
-GET  /api/users/me                — current user profile
-PATCH /api/users/me               — update profile
-PATCH /api/users/me/active-role   — switch active role
-GET  /api/users/profile/:username — public profile
-GET  /api/users/search            — search users
-```
-
-### bff-service (port 3002)
-
-Single entry point for the frontend. Manages Redis sessions and proxies requests to microservices with internal headers (`x-user-id`, `x-user-role`, etc.).
-
-The frontend communicates **only** with the BFF via `session-id` cookie — no JWT is exposed to the browser.
-
-### event-service (port 3001)
-
-```
-GET  /api/events                  — list events (paginated, filterable)
-POST /api/events                  — create event (ORGANIZER+)
-GET  /api/events/:id              — event detail (public)
-PATCH /api/events/:id             — update event
-POST /api/events/:id/promo-codes  — create promo code
-POST /api/events/:id/affiliate-links — generate affiliate link
-GET  /api/tickets/:id             — ticket detail
-PATCH /api/tickets/:id/sold       — update sold count (internal)
-```
-
-### booking-service (port 3003)
-
-```
-POST /api/bookings                — create booking (with Redis lock, 10min)
-GET  /api/bookings/me             — user's bookings
-POST /api/bookings/validate-qr    — validate QR code (< 2s)
-PATCH /api/bookings/:id/scan      — mark ticket as used
-```
-
-### payment-service (port 3004)
-
-```
-POST /api/payments/intent         — create Stripe PaymentIntent
-POST /api/payments/webhook        — Stripe webhook handler
-POST /api/payments/methods/card   — save card
-POST /api/payments/methods/mobile-money — save Mobile Money
-GET  /api/payments/transactions   — transaction history
-```
-
-### engagement-service (port 3005)
-
-```
-POST /api/likes/:type/:id         — toggle like
-POST /api/comments                — add comment
-POST /api/saves/:type/:id         — toggle save
-POST /api/follows/:type/:id       — toggle follow
-POST /api/votes/:phaseId/cast     — cast vote
-POST /api/reviews                 — submit review
-POST /api/reports                 — report content
-```
-
-### notification-service (port 3006)
-
-RabbitMQ consumer — no public HTTP endpoints for sending notifications.
-
-```
-GET  /api/notifications           — in-app notifications
-PATCH /api/notifications/:id/read — mark as read
-GET  /api/notifications/preferences — notification preferences
-PATCH /api/notifications/preferences — update preferences
-```
-
----
-
-## Database Schema — Key Models
-
-Each service has its own PostgreSQL database. There are no foreign key constraints across services — IDs are shared by convention using fixed prefixes.
-
-### ID conventions
-
-```
-uni_buyin_000000000001   — University
-usr_alice_000000000002   — User
-evt_hackathon_000000001  — Event
-tkt_hack_free_000001     — Ticket
-bkg_alice_hack_001       — Booking
-```
-
-### auth-service
-
-```
-University  — id, name, emailDomain, country, city
-User        — id, email, password, firstName, lastName, accountType, activeRole,
-              status, kycStatus, trustBadge, xp, badge, universityId
-KycDocument — id, userId, idDocumentUrl, bankInfo, status
-Group       — id, name, ownerId
-GroupMember — id, groupId, userId, role
-```
-
-### event-service
-
-```
-Event         — id, title, description, categoryId, status, visibility,
-                startDate, endDate, organizerId, universityId
-Ticket        — id, name, type (FREE|PAID), price, quantity, sold, eventId
-PromoCode     — id, code, discount, maxUses, usedCount, expiresAt, eventId
-AffiliateLink — id, token, affiliateId, clicks, conversions, eventId
-```
-
-### booking-service
-
-```
-Booking — id, userId, ticketId, eventId, status, quantity, totalPrice,
-          qrCode, paidAt, usedAt, promoCodeId, discountApplied, lockedUntil
-```
-
-### payment-service
-
-```
-Transaction     — id, userId, bookingId, eventId, organizerId, amount (cents),
-                  currency, status, stripePaymentId, commission, commissionRate
-PaymentMethod   — id, userId, type (CARD|MOBILE_MONEY), stripeId, brand, last4
-MobileMoneyProvider — id, name, countryCode, isActive
-```
-
----
-
-## Development Setup
-
-### Prerequisites
-
-- Docker + Docker Compose
-- Node.js 20+
-- npm
-
-### Start all services
-
-```bash
-docker-compose up -d
-```
-
-### Seed the databases
-
-Run seeds in order (auth first, others depend on user IDs):
-
-```bash
-npm run prisma:seed --prefix auth-service
-npm run prisma:seed --prefix event-service
-npm run prisma:seed --prefix booking-service
-npm run prisma:seed --prefix engagement-service
-npm run prisma:seed --prefix payment-service
-npm run prisma:seed --prefix notification-service
-```
-
-### Test accounts (password: `Password123!`)
-
-| Email | Role | University |
-|---|---|---|
-| admin@buyin.cc | ADMIN | Buyin |
-| alice@buyin.cc | STUDENT | Buyin |
-| clara@buyin.cc | ORGANIZER | Buyin |
-| hugo@buyin.cc | ORGANIZER | Buyin |
-| david@wappnet.cc | STUDENT | Wappnet |
-| emma@wappnet.cc | ORGANIZER | Wappnet |
-
-### Frontend dev server
-
-```bash
-cd frontend
-cp .env.example .env
-npm install
-npm run dev
-```
-
----
-
-## Environment Variables
-
-Each service reads from its own `.env` file. See `.env.example` in each service directory.
-
-### Key variables
-
-| Variable | Service | Description |
-|---|---|---|
-| `DATABASE_URL` | all | PostgreSQL connection string |
-| `REDIS_URL` | bff, event, booking | Redis connection string |
-| `RABBITMQ_URL` | all | RabbitMQ connection string |
-| `JWT_ACCESS_SECRET` | auth | Access token signing key |
-| `JWT_REFRESH_SECRET` | auth | Refresh token signing key |
-| `STRIPE_SECRET_KEY` | payment | Stripe secret key |
-| `STRIPE_WEBHOOK_SECRET` | payment | Stripe webhook signing secret |
-| `AWS_S3_BUCKET` | auth, event | S3 bucket for file uploads |
-| `FRONTEND_URL` | auth | Used in password reset links |
-| `VITE_API_URL` | frontend | BFF base URL |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | frontend | Stripe publishable key |
 
 ---
 
