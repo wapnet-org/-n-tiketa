@@ -47,7 +47,6 @@ Visit [tiketa.app](https://www.tiketa.app) to get started.
 |---|---|
 | Website | [tiketa.app](https://www.tiketa.app) |
 | Email | [arrowvyaleveka@gmail.com](mailto:arrowvyaleveka@gmail.com) |
-| Phone | +370 618 07405 |
 | Facebook | [instagram.com/aaron_vyal](https://www.instagram.com/aaron_vyal) |
 
 ---
