@@ -22,8 +22,17 @@ Tiketa is a public event ticketing platform. Anyone can create an event — free
 
 <div align="center">
 
-<img src="https://pub-7fc8e6751593453fb1b6aa998865ab95.r2.dev/public-img-repo/Screenshot%202026-04-26%20152543.png" width="45%" />
-<img src="https://pub-7fc8e6751593453fb1b6aa998865ab95.r2.dev/public-img-repo/Screenshot%202026-04-26%20152653.png" width="45%" />
+**Desktop**
+
+<img src="https://pub-7fc8e6751593453fb1b6aa998865ab95.r2.dev/public-img-repo/Screenshot%202026-04-26%20152543.png" width="80%" />
+
+</div>
+
+<div align="center">
+
+**Mobile**
+
+<img src="https://pub-7fc8e6751593453fb1b6aa998865ab95.r2.dev/public-img-repo/Screenshot%202026-04-26%20152653.png" width="35%" />
 
 </div>
 
